@@ -8,7 +8,7 @@ import 'package:drivly2/screens/signup_screen.dart';
 import 'package:drivly2/screens/verify_email_screen.dart';
 import 'package:drivly2/services/firebase_streem.dart';
 
-// Firebase Авторизация - Сценарии:
+// Firebase Авторизацияd - Сценарии:
 //    Войти - Почта / Пароль
 //    Личный кабинет
 //    Зарегистрироваться - Почта / Пароль два раза
