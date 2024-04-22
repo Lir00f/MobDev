@@ -2,9 +2,11 @@ import 'package:firebase_auth/firebase_auth.dart';
 import 'package:flutter/material.dart';
 import 'package:drivly2/screens/account_screen.dart';
 import 'package:drivly2/screens/login_screen.dart';
+import 'registered_content.dart';
+import 'unregistered_content.dart';
 
 class HomeScreen extends StatelessWidget {
-  const HomeScreen({super.key});
+  const HomeScreen({Key? key});
 
   @override
   Widget build(BuildContext context) {
@@ -39,10 +41,7 @@ class HomeScreen extends StatelessWidget {
       ),
       body: SafeArea(
         child: Center(
-          child: (user == null)
-              ? const Text("Контент для НЕ зарегистрированных в системе")
-              : const Text('Контент для ЗАРЕГИСТРИРОВАННЫХ в системе'),
-          //child: Text('Контент для НЕ зарегистрированных в системе'),
+          child: (user == null) ? UnregisteredContent() : RegisteredContent(),
         ),
       ),
     );
