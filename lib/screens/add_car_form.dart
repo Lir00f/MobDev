@@ -1,6 +1,8 @@
 import 'package:flutter/material.dart';
 import 'package:image_picker/image_picker.dart';
 import 'dart:io';
+import 'package:firebase_core/firebase_core.dart';
+import 'package:cloud_firestore/cloud_firestore.dart';
 
 class AddCarForm extends StatefulWidget {
   @override
@@ -53,6 +55,37 @@ class _AddCarFormState extends State<AddCarForm> {
       setState(() {
         _images.removeAt(index);
       });
+    }
+  }
+
+  Future<void> _addCarToFirebase() async {
+    try {
+      FirebaseFirestore firestore = FirebaseFirestore.instance;
+      String userId = 'user123';
+      await firestore.collection('cars').add({
+        'brand': _brand,
+        'model': _model,
+        'mileage': _mileage,
+        'pricePerDay': _pricePerDay,
+        'insurance': _insurance,
+        'userId': userId,
+      });
+      setState(() {
+        _brand = '';
+        _model = '';
+        _mileage = '';
+        _pricePerDay = 0.0;
+        _insurance = false;
+        _images.clear();
+      });
+      ScaffoldMessenger.of(context).showSnackBar(SnackBar(
+        content: Text('Машина успешно добавлена в базу данных'),
+      ));
+    } catch (error) {
+      print('Error adding car: $error');
+      ScaffoldMessenger.of(context).showSnackBar(SnackBar(
+        content: Text('Ошибка при добавлении машины в базу данных'),
+      ));
     }
   }
 
@@ -152,9 +185,7 @@ class _AddCarFormState extends State<AddCarForm> {
             ),
             SizedBox(height: 16.0),
             ElevatedButton(
-              onPressed: _insurance ? () {
-                // Добавление машины
-              } : null,
+              onPressed: _insurance ? _addCarToFirebase : null,
               child: Text('Добавить машину'),
             ),
           ],
@@ -164,7 +195,9 @@ class _AddCarFormState extends State<AddCarForm> {
   }
 }
 
-void main() {
+void main() async {
+  WidgetsFlutterBinding.ensureInitialized();
+  await Firebase.initializeApp();
   runApp(MaterialApp(
     home: AddCarForm(),
   ));
