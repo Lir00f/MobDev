@@ -1,5 +1,6 @@
 import 'package:flutter/material.dart';
 import 'signup_screen.dart';
+import 'login_screen.dart';
 
 class UnregisteredContent extends StatefulWidget {
   const UnregisteredContent({Key? key}) : super(key: key);
@@ -43,12 +44,6 @@ class _UnregisteredContentState extends State<UnregisteredContent>
     super.dispose();
   }
 
-  void _handleRegisterButtonPressed(BuildContext context) {
-    Navigator.push(
-      context,
-      MaterialPageRoute(builder: (context) => SignUpScreen()),
-    );
-  }
 
   @override
   Widget build(BuildContext context) {
@@ -391,7 +386,7 @@ class _UnregisteredContentState extends State<UnregisteredContent>
         ],
       ),
       floatingActionButton: SizedBox(
-        width: MediaQuery.of(context).size.width * 0.8, // Set the width to 80% of the screen width
+        width: MediaQuery.of(context).size.width * 0.8,
         child: FloatingActionButton.extended(
           onPressed: () {
             _handleRegisterButtonPressed(context);
@@ -406,6 +401,42 @@ class _UnregisteredContentState extends State<UnregisteredContent>
         ),
       ),
       floatingActionButtonLocation: FloatingActionButtonLocation.centerFloat,
+    );
+  }
+  void _handleRegisterButtonPressed(BuildContext context) {
+    showModalBottomSheet(
+      context: context,
+      builder: (BuildContext context) {
+        return Container(
+          child: Column(
+            mainAxisSize: MainAxisSize.min,
+            children: <Widget>[
+              ListTile(
+                leading: Icon(Icons.login),
+                title: Text('Войти'),
+                onTap: () {
+                  Navigator.pop(context); // Закрываем модальное окно
+                  Navigator.push(
+                    context,
+                    MaterialPageRoute(builder: (context) => LoginScreen()),
+                  );
+                },
+              ),
+              ListTile(
+                leading: Icon(Icons.person_add),
+                title: Text('Зарегистрироваться'),
+                onTap: () {
+                  Navigator.pop(context); // Закрываем модальное окно
+                  Navigator.push(
+                    context,
+                    MaterialPageRoute(builder: (context) => SignUpScreen()),
+                  );
+                },
+              ),
+            ],
+          ),
+        );
+      },
     );
   }
 }
