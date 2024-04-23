@@ -307,7 +307,7 @@ class _UnregisteredContentState extends State<UnregisteredContent>
                               Container(
                                 margin: EdgeInsets.only(bottom: 10.0),
                                 child: Text(
-                                  '3) Кредитная карта: для оформления залога или оплаты.',
+                                  '3) Кредитная или дебетовая карта: для оформления залога или оплаты.',
                                   style: TextStyle(
                                     fontSize: 14.0,
                                     color: Colors.black,
