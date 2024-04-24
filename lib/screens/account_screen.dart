@@ -4,7 +4,7 @@ import 'package:cloud_firestore/cloud_firestore.dart';
 import 'package:intl/intl.dart';
 
 class AccountScreen extends StatefulWidget {
-  const AccountScreen({super.key});
+  const AccountScreen({Key? key}) : super(key: key);
 
   @override
   State<AccountScreen> createState() => _AccountScreenState();
@@ -29,10 +29,25 @@ class _AccountScreenState extends State<AccountScreen> {
 
     List<Map<String, dynamic>> rentedCars = [];
     rentalDocs.docs.forEach((doc) {
-      rentedCars.add(doc.data());
+      rentedCars.add({...doc.data(), 'id': doc.id});
     });
 
     return rentedCars;
+  }
+
+  Future<void> deleteRental(String rentalId) async {
+    try {
+      await FirebaseFirestore.instance.collection('rentals').doc(rentalId).delete();
+      ScaffoldMessenger.of(context).showSnackBar(SnackBar(
+        content: Text('Заявка на аренду удалена успешно'),
+        duration: Duration(seconds: 2),
+      ));
+    } catch (e) {
+      ScaffoldMessenger.of(context).showSnackBar(SnackBar(
+        content: Text('Ошибка при удалении заявки на аренду: $e'),
+        duration: Duration(seconds: 2),
+      ));
+    }
   }
 
   @override
@@ -83,6 +98,7 @@ class _AccountScreenState extends State<AccountScreen> {
                       final startDate = (car['startDate'] as Timestamp).toDate();
                       final endDate = (car['endDate'] as Timestamp).toDate();
                       final carName = car['carName'];
+                      final rentalId = car['id'];
 
                       return Card(
                         margin: EdgeInsets.symmetric(vertical: 8),
@@ -102,6 +118,11 @@ class _AccountScreenState extends State<AccountScreen> {
                               Text(
                                 'Можно оплатить и забрать на нашем автопарке по адресу: ул. Джеппар Акима 36',
                                 style: TextStyle(fontSize: 12, fontStyle: FontStyle.italic),
+                              ),
+                              SizedBox(height: 8),
+                              ElevatedButton(
+                                onPressed: () => deleteRental(rentalId),
+                                child: Text('Удалить заявку'),
                               ),
                             ],
                           ),
