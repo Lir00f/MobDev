@@ -3,6 +3,7 @@ import 'dart:typed_data';
 import 'package:cloud_firestore/cloud_firestore.dart';
 import 'package:firebase_auth/firebase_auth.dart';
 import 'package:flutter/material.dart';
+import 'package:intl/intl.dart';
 
 class CarDetailsPage extends StatefulWidget {
   final Map<String, dynamic> data;
@@ -20,6 +21,7 @@ class _CarDetailsPageState extends State<CarDetailsPage> {
   @override
   Widget build(BuildContext context) {
     List<String> base64Images = List<String>.from(widget.data['base64Images'] ?? []);
+    final pricePerDayFormatted = NumberFormat('#,##0', 'ru_RU').format(widget.data['pricePerDay']);
     List<Widget> imageWidgets = base64Images.map((base64String) {
       Uint8List bytes = base64.decode(base64String);
       return GestureDetector(
@@ -44,7 +46,10 @@ class _CarDetailsPageState extends State<CarDetailsPage> {
 
     return Scaffold(
       appBar: AppBar(
-        title: Text(widget.data['brand'] + ' ' + widget.data['model']),
+        title: Text(
+          '${widget.data['brand']} ${widget.data['model']}',
+          style: TextStyle(fontWeight: FontWeight.bold, fontSize: 20.0),
+        ),
       ),
       body: Column(
         crossAxisAlignment: CrossAxisAlignment.start,
@@ -58,17 +63,50 @@ class _CarDetailsPageState extends State<CarDetailsPage> {
                     children: imageWidgets,
                   ),
                 ),
-                ListTile(
-                  title: Text('Пробег: ${widget.data['mileage']} км'),
-                ),
-                ListTile(
-                  title: Text('Год выпуска: ${widget.data['year']}'),
-                ),
-                ListTile(
-                  title: Text('Мотор: ${widget.data['engine']}'),
-                ),
-                ListTile(
-                  title: Text('Описание: ${widget.data['description']}'),
+                Padding(
+                  padding: const EdgeInsets.symmetric(horizontal: 16.0),
+                  child: Column(
+                    crossAxisAlignment: CrossAxisAlignment.start,
+                    children: [
+                      Text(
+                        '',
+                        style: TextStyle(fontWeight: FontWeight.bold, fontSize: 16.0),
+                      ),
+                      Text(
+                        '$pricePerDayFormatted ₽ в сутки',
+                        style: TextStyle(fontWeight: FontWeight.bold, fontSize: 24.0),
+                      ),
+                      SizedBox(height: 16.0),
+                      Text(
+                        '${widget.data['brand']} ${widget.data['model']}',
+                        style: TextStyle(fontWeight: FontWeight.bold, fontSize: 18.0),
+                      ),
+                      SizedBox(height: 16.0),
+                      Row(
+                        children: [
+                          Expanded(
+                            child: _buildFeatureTile('Расход', 'Расход по городу: ${widget.data['cityMileage']} л. на 100 км.\nРасход по трассе: ${widget.data['highwayMileage']} л. на 100 км.\nСмешанный расход: ${widget.data['mixedMileage']} л. на 100 км.'),
+                          ),
+                          SizedBox(width: 8.0),
+                          Expanded(
+                            child: _buildFeatureTile('Двигатель', '${widget.data['horsepower']} л.с. при ${widget.data['rpm']} об/мин\n${widget.data['torque']} Н∙м при ${widget.data['torqueRpm']} об/мин'),
+                          ),
+                          SizedBox(width: 8.0),
+                          Expanded(
+                            child: _buildFeatureTile('Коробка передач','${widget.data['transmissionType']}\n${widget.data['transmissionSpeed']}'),
+                          ),
+                        ],
+                      ),
+                      SizedBox(height: 16.0),
+                      Text(
+                        'Описание:',
+                        style: TextStyle(fontWeight: FontWeight.bold, fontSize: 16.0),
+                      ),
+                      Text(
+                        '${widget.data['description']}',
+                      ),
+                    ],
+                  ),
                 ),
               ],
             ),
@@ -82,6 +120,27 @@ class _CarDetailsPageState extends State<CarDetailsPage> {
               child: Text('Взять в аренду'),
             ),
           ),
+        ],
+      ),
+    );
+  }
+
+  Widget _buildFeatureTile(String title, String subtitle) {
+    return Container(
+      padding: EdgeInsets.all(16.0),
+      decoration: BoxDecoration(
+        border: Border.all(color: Colors.grey),
+        borderRadius: BorderRadius.circular(10.0),
+      ),
+      child: Column(
+        crossAxisAlignment: CrossAxisAlignment.start,
+        children: [
+          Text(
+            title,
+            style: TextStyle(fontWeight: FontWeight.bold, fontSize: 16),
+          ),
+          SizedBox(height: 8.0),
+          Text(subtitle),
         ],
       ),
     );

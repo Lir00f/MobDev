@@ -21,6 +21,16 @@ class _AddCarFormState extends State<AddCarForm> {
   String _mileage = '';
   double _pricePerDay = 0.0;
   bool _insurance = false;
+  String _description ='';
+  String _cityMileage ='';
+  String _highwayMileage ='';
+  String _horsepower='';
+  String _mixedMileage ='';
+  String _rpm = '';
+  String _torque = '';
+  String _torqueRpm = '';
+  String _transmissionSpeed = '';
+  String _transmissionType = '';
 
   Future<void> _pickImage(ImageSource source) async {
     final pickedImage = await ImagePicker().pickImage(source: source);
@@ -101,12 +111,32 @@ class _AddCarFormState extends State<AddCarForm> {
         'insurance': _insurance,
         'userId': userId,
         'base64Images': base64Images,
+        'description':_description,
+        'cityMileage':_cityMileage,
+        'highwayMileage':_highwayMileage,
+        'horsepower':_horsepower,
+        'mixedMileage':_mixedMileage,
+        'rpm':_rpm,
+        'torque':_torque,
+        'torqueRpm':_torqueRpm,
+        'transmissionSpeed':_transmissionSpeed,
+        'transmissionType':_transmissionType,
       });
 
       setState(() {
         _brand = '';
         _model = '';
         _mileage = '';
+        _description ='';
+        _cityMileage ='';
+        _highwayMileage ='';
+        _horsepower='';
+        _mixedMileage ='';
+        _rpm = '';
+        _torque = '';
+        _torqueRpm = '';
+        _transmissionSpeed = '';
+        _transmissionType = '';
         _pricePerDay = 0.0;
         _insurance = false;
         _images.clear();
@@ -161,6 +191,109 @@ class _AddCarFormState extends State<AddCarForm> {
                 });
               },
             ),
+
+            SizedBox(height: 16.0),
+            TextFormField(
+              decoration: InputDecoration(labelText: 'Описание'),
+              onChanged: (value) {
+                setState(() {
+                  _description = value;
+                });
+              },
+            ),
+
+            SizedBox(height: 16.0),
+            TextFormField(
+              decoration: InputDecoration(labelText: 'Лошадинные силы'),
+              onChanged: (value) {
+                setState(() {
+                  _horsepower = value;
+                });
+              },
+            ),
+
+            SizedBox(height: 16.0),
+            TextFormField(
+              decoration: InputDecoration(labelText: 'При обортах(л.с.)'),
+              onChanged: (value) {
+                setState(() {
+                  _rpm = value;
+                });
+              },
+            ),
+
+            SizedBox(height: 16.0),
+            TextFormField(
+              decoration: InputDecoration(labelText: 'Крутящий момент'),
+              onChanged: (value) {
+                setState(() {
+                  _torque = value;
+                });
+              },
+            ),
+
+            SizedBox(height: 16.0),
+            TextFormField(
+              decoration: InputDecoration(labelText: 'При обортах'),
+              onChanged: (value) {
+                setState(() {
+                  _torqueRpm = value;
+                });
+              },
+            ),
+
+            SizedBox(height: 16.0),
+            TextFormField(
+              decoration: InputDecoration(labelText: 'Тип трансмиссии'),
+              onChanged: (value) {
+                setState(() {
+                  _transmissionType = value;
+                });
+              },
+            ),
+
+            SizedBox(height: 16.0),
+            TextFormField(
+              decoration: InputDecoration(labelText: 'Количество передач'),
+              onChanged: (value) {
+                setState(() {
+                  _transmissionSpeed = value;
+                });
+              },
+            ),
+
+            SizedBox(height: 16.0),
+            TextFormField(
+              decoration: InputDecoration(labelText: 'Расход в городском цикле (л. на 100 км.)'),
+              onChanged: (value) {
+                setState(() {
+                  _cityMileage = value;
+                });
+              },
+            ),
+
+            SizedBox(height: 16.0),
+            TextFormField(
+              decoration: InputDecoration(labelText: 'Расход за городом (л. на 100 км.'),
+              onChanged: (value) {
+                setState(() {
+                  _highwayMileage = value;
+                });
+              },
+            ),
+
+            SizedBox(height: 16.0),
+            TextFormField(
+              decoration: InputDecoration(labelText: 'Расход в смешанном цикле (л. на 100 км.'),
+              onChanged: (value) {
+                setState(() {
+                  _mixedMileage = value;
+                });
+              },
+            ),
+
+
+
             SizedBox(height: 16.0),
             Row(
               children: [
