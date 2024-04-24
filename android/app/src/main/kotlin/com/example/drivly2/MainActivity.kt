@@ -1,5 +1,0 @@
-package com.example.drivly2
-
-import io.flutter.embedding.android.FlutterActivity
-
-class MainActivity: FlutterActivity()
