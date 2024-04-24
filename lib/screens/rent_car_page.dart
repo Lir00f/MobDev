@@ -14,85 +14,87 @@ class RentCarPage extends StatelessWidget {
       appBar: AppBar(
         title: const Text('Снять машину'),
       ),
-      body: StreamBuilder(
-        stream: FirebaseFirestore.instance.collection('cars').snapshots(),
-        builder: (BuildContext context, AsyncSnapshot<QuerySnapshot> snapshot) {
-          if (snapshot.hasError) {
-            return Text('Ошибка: ${snapshot.error}');
-          }
-
-          if (snapshot.connectionState == ConnectionState.waiting) {
-            return const CircularProgressIndicator();
-          }
-
-          final currentUserEmail = FirebaseAuth.instance.currentUser?.email;
-
-          final myCars = <DocumentSnapshot>[];
-          final otherCars = <DocumentSnapshot>[];
-
-          snapshot.data!.docs.forEach((DocumentSnapshot document) {
-            final data = document.data() as Map<String, dynamic>; // Explicit cast to Map<String, dynamic>
-            if (data["userId"] == currentUserEmail) {
-              myCars.add(document);
-            } else {
-              otherCars.add(document);
+      body: SingleChildScrollView( // Обернули Scaffold в SingleChildScrollView
+        child: StreamBuilder(
+          stream: FirebaseFirestore.instance.collection('cars').snapshots(),
+          builder: (BuildContext context, AsyncSnapshot<QuerySnapshot> snapshot) {
+            if (snapshot.hasError) {
+              return Text('Ошибка: ${snapshot.error}');
             }
-          });
 
-          Widget myCarsWidget = SizedBox.shrink();
-          if (myCars.isNotEmpty) {
-            myCarsWidget = Column(
+            if (snapshot.connectionState == ConnectionState.waiting) {
+              return const CircularProgressIndicator();
+            }
+
+            final currentUserEmail = FirebaseAuth.instance.currentUser?.email;
+
+            final myCars = <DocumentSnapshot>[];
+            final otherCars = <DocumentSnapshot>[];
+
+            snapshot.data!.docs.forEach((DocumentSnapshot document) {
+              final data = document.data() as Map<String, dynamic>; // Explicit cast to Map<String, dynamic>
+              if (data["userId"] == currentUserEmail) {
+                myCars.add(document);
+              } else {
+                otherCars.add(document);
+              }
+            });
+
+            Widget myCarsWidget = SizedBox.shrink();
+            if (myCars.isNotEmpty) {
+              myCarsWidget = Column(
+                crossAxisAlignment: CrossAxisAlignment.start,
+                children: [
+                  Padding(
+                    padding: const EdgeInsets.all(8.0),
+                    child: Text(
+                      'Мои машины на аренду',
+                      style: TextStyle(fontWeight: FontWeight.bold, fontSize: 18),
+                    ),
+                  ),
+                  ListView(
+                    shrinkWrap: true,
+                    physics: ClampingScrollPhysics(),
+                    children: myCars.map((DocumentSnapshot document) {
+                      return CarCard(data: document.data() as Map<String, dynamic>);
+                    }).toList(),
+                  ),
+                ],
+              );
+            }
+
+            Widget otherCarsWidget = SizedBox.shrink();
+            if (otherCars.isNotEmpty) {
+              otherCarsWidget = Column(
+                crossAxisAlignment: CrossAxisAlignment.start,
+                children: [
+                  Padding(
+                    padding: const EdgeInsets.all(8.0),
+                    child: Text(
+                      'Машины других пользователей',
+                      style: TextStyle(fontWeight: FontWeight.bold, fontSize: 18),
+                    ),
+                  ),
+                  ListView(
+                    shrinkWrap: true,
+                    physics: ClampingScrollPhysics(),
+                    children: otherCars.map((DocumentSnapshot document) {
+                      return CarCard(data: document.data() as Map<String, dynamic>);
+                    }).toList(),
+                  ),
+                ],
+              );
+            }
+
+            return Column(
               crossAxisAlignment: CrossAxisAlignment.start,
               children: [
-                Padding(
-                  padding: const EdgeInsets.all(8.0),
-                  child: Text(
-                    'Мои машины на аренду',
-                    style: TextStyle(fontWeight: FontWeight.bold, fontSize: 18),
-                  ),
-                ),
-                ListView(
-                  shrinkWrap: true,
-                  physics: ClampingScrollPhysics(),
-                  children: myCars.map((DocumentSnapshot document) {
-                    return CarCard(data: document.data() as Map<String, dynamic>);
-                  }).toList(),
-                ),
+                myCarsWidget,
+                otherCarsWidget,
               ],
             );
-          }
-
-          Widget otherCarsWidget = SizedBox.shrink();
-          if (otherCars.isNotEmpty) {
-            otherCarsWidget = Column(
-              crossAxisAlignment: CrossAxisAlignment.start,
-              children: [
-                Padding(
-                  padding: const EdgeInsets.all(8.0),
-                  child: Text(
-                    'Машины других пользователей',
-                    style: TextStyle(fontWeight: FontWeight.bold, fontSize: 18),
-                  ),
-                ),
-                ListView(
-                  shrinkWrap: true,
-                  physics: ClampingScrollPhysics(),
-                  children: otherCars.map((DocumentSnapshot document) {
-                    return CarCard(data: document.data() as Map<String, dynamic>);
-                  }).toList(),
-                ),
-              ],
-            );
-          }
-
-          return Column(
-            crossAxisAlignment: CrossAxisAlignment.start,
-            children: [
-              myCarsWidget,
-              otherCarsWidget,
-            ],
-          );
-        },
+          },
+        ),
       ),
     );
   }
@@ -106,9 +108,11 @@ class CarCard extends StatelessWidget {
   @override
   Widget build(BuildContext context) {
     List<String> base64Images = List<String>.from(data['base64Images'] ?? []);
-    List<Image> images = base64Images.map((base64String) {
+    List<Widget> imageWidgets = base64Images.map((base64String) {
       Uint8List bytes = base64.decode(base64String);
-      return Image.memory(bytes);
+      return Expanded(
+        child: Image.memory(bytes, fit: BoxFit.cover),
+      );
     }).toList();
 
     return Card(
@@ -128,14 +132,14 @@ class CarCard extends StatelessWidget {
             ),
           ),
           SizedBox(
-            height: 200, // Set height according to your needs
+            height: 200,
             child: ListView.builder(
               scrollDirection: Axis.horizontal,
-              itemCount: images.length,
+              itemCount: imageWidgets.length,
               itemBuilder: (BuildContext context, int index) {
                 return Padding(
                   padding: const EdgeInsets.all(8.0),
-                  child: images[index],
+                  child: imageWidgets[index],
                 );
               },
             ),
