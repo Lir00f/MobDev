@@ -7,7 +7,7 @@ import 'package:flutter/material.dart';
 class CarDetailsPage extends StatefulWidget {
   final Map<String, dynamic> data;
 
-  const CarDetailsPage({Key? key, required this.data}) : super(key: key);
+  const CarDetailsPage({super.key, required this.data});
 
   @override
   _CarDetailsPageState createState() => _CarDetailsPageState();
@@ -135,11 +135,9 @@ class _CarDetailsPageState extends State<CarDetailsPage> {
   }
 
   void _confirmRent(DateTime startDate, DateTime endDate) {
-    // Получаем текущего пользователя
     User? user = FirebaseAuth.instance.currentUser;
 
     if (user != null) {
-      // Отправляем данные в Firestore
       FirebaseFirestore.instance.collection('rentals').add({
         'email': user.email,
         'startDate': startDate,
