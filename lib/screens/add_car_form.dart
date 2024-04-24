@@ -29,8 +29,8 @@ class _AddCarFormState extends State<AddCarForm> {
   String _rpm = '';
   String _torque = '';
   String _torqueRpm = '';
-  String _transmissionSpeed = '';
-  String _transmissionType = '';
+  String _transmissionType = 'МКПП';
+  int _transmissionSpeed = 3;
 
   Future<void> _pickImage(ImageSource source) async {
     final pickedImage = await ImagePicker().pickImage(source: source);
@@ -135,7 +135,7 @@ class _AddCarFormState extends State<AddCarForm> {
         _rpm = '';
         _torque = '';
         _torqueRpm = '';
-        _transmissionSpeed = '';
+        _transmissionSpeed = 3;
         _transmissionType = '';
         _pricePerDay = 0.0;
         _insurance = false;
@@ -243,21 +243,35 @@ class _AddCarFormState extends State<AddCarForm> {
             ),
 
             SizedBox(height: 16.0),
-            TextFormField(
+            DropdownButtonFormField<String>(
+              value: _transmissionType.isNotEmpty ? _transmissionType : null,
               decoration: InputDecoration(labelText: 'Тип трансмиссии'),
+              items: ['МКПП', 'АКПП', 'Робот', 'Вариатор'].map((String value) {
+                return DropdownMenuItem<String>(
+                  value: value,
+                  child: Text(value),
+                );
+              }).toList(),
               onChanged: (value) {
                 setState(() {
-                  _transmissionType = value;
+                  _transmissionType = value!;
                 });
               },
             ),
 
             SizedBox(height: 16.0),
-            TextFormField(
+            DropdownButtonFormField<int>(
+              value: _transmissionSpeed,
               decoration: InputDecoration(labelText: 'Количество передач'),
+              items: List.generate(7, (index) => index + 3).map((int value) {
+                return DropdownMenuItem<int>(
+                  value: value,
+                  child: Text(value.toString()),
+                );
+              }).toList(),
               onChanged: (value) {
                 setState(() {
-                  _transmissionSpeed = value;
+                  _transmissionSpeed = value!;
                 });
               },
             ),
