@@ -1,12 +1,16 @@
+import 'dart:convert';
+import 'dart:typed_data';
 import 'package:flutter/material.dart';
 import 'package:cloud_firestore/cloud_firestore.dart';
 
 class RentCarPage extends StatelessWidget {
+  const RentCarPage({Key? key}) : super(key: key);
+
   @override
   Widget build(BuildContext context) {
     return Scaffold(
       appBar: AppBar(
-        title: Text('Снять машину'),
+        title: const Text('Снять машину'),
       ),
       body: StreamBuilder(
         stream: FirebaseFirestore.instance.collection('cars').snapshots(),
@@ -16,7 +20,7 @@ class RentCarPage extends StatelessWidget {
           }
 
           if (snapshot.connectionState == ConnectionState.waiting) {
-            return CircularProgressIndicator();
+            return const CircularProgressIndicator();
           }
 
           return ListView(
@@ -34,21 +38,50 @@ class RentCarPage extends StatelessWidget {
 class CarCard extends StatelessWidget {
   final Map<String, dynamic> data;
 
-  const CarCard({required this.data});
+  const CarCard({Key? key, required this.data}) : super(key: key);
 
   @override
   Widget build(BuildContext context) {
+    List<String> base64Images = List<String>.from(data['base64Images'] ?? []);
+    List<Image> images = base64Images.map((base64String) {
+      Uint8List bytes = base64.decode(base64String);
+      return Image.memory(bytes);
+    }).toList();
+
     return Card(
-      child: ListTile(
-        title: Text(data['brand'] + ' ' + data['model']),
-        subtitle: Text('Пробег: ${data['mileage']} км'),
-        trailing: ElevatedButton(
-          onPressed: () {
-            // Implement functionality to rent the car
-          },
-          child: Text('Собрать в аренду'),
-        ),
+      child: Column(
+        children: [
+          ListTile(
+            title: Text(data['brand'] + ' ' + data['model']),
+            subtitle: Text('Пробег: ${data['mileage']} км'),
+            trailing: ElevatedButton(
+              onPressed: () {
+                // Implement functionality to rent the car
+              },
+              child: const Text('Больше информации'),
+            ),
+          ),
+          SizedBox(
+            height: 200, // Set height according to your needs
+            child: ListView.builder(
+              scrollDirection: Axis.horizontal,
+              itemCount: images.length,
+              itemBuilder: (BuildContext context, int index) {
+                return Padding(
+                  padding: const EdgeInsets.all(8.0),
+                  child: images[index],
+                );
+              },
+            ),
+          ),
+        ],
       ),
     );
   }
+}
+
+void main() {
+  runApp(MaterialApp(
+    home: RentCarPage(),
+  ));
 }

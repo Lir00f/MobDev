@@ -1,10 +1,15 @@
+import 'dart:convert';
+
 import 'package:flutter/material.dart';
 import 'package:image_picker/image_picker.dart';
 import 'dart:io';
 import 'package:firebase_core/firebase_core.dart';
 import 'package:cloud_firestore/cloud_firestore.dart';
+import 'package:firebase_storage/firebase_storage.dart';
 
 class AddCarForm extends StatefulWidget {
+  const AddCarForm({Key? key}) : super(key: key);
+
   @override
   _AddCarFormState createState() => _AddCarFormState();
 }
@@ -58,10 +63,36 @@ class _AddCarFormState extends State<AddCarForm> {
     }
   }
 
+  Future<String> _uploadImageToStorage(File imageFile) async {
+    try {
+      final Reference storageReference = FirebaseStorage.instance.ref().child('car_images/${DateTime.now().millisecondsSinceEpoch}');
+      final UploadTask uploadTask = storageReference.putFile(imageFile);
+      final TaskSnapshot downloadUrl = await uploadTask;
+      final String url = await downloadUrl.ref.getDownloadURL();
+      return url;
+    } catch (error) {
+      print('Error uploading image: $error');
+      throw error;
+    }
+  }
+
+  Future<String> _convertImageToBase64(File imageFile) async {
+    List<int> imageBytes = await imageFile.readAsBytes();
+    String base64Image = base64Encode(imageBytes);
+    return base64Image;
+  }
+
   Future<void> _addCarToFirebase() async {
     try {
       FirebaseFirestore firestore = FirebaseFirestore.instance;
       String userId = 'user123';
+
+      List<String> base64Images = [];
+      for (File imageFile in _images) {
+        String base64Image = await _convertImageToBase64(imageFile);
+        base64Images.add(base64Image);
+      }
+
       await firestore.collection('cars').add({
         'brand': _brand,
         'model': _model,
@@ -69,7 +100,9 @@ class _AddCarFormState extends State<AddCarForm> {
         'pricePerDay': _pricePerDay,
         'insurance': _insurance,
         'userId': userId,
+        'base64Images': base64Images,
       });
+
       setState(() {
         _brand = '';
         _model = '';
@@ -78,6 +111,7 @@ class _AddCarFormState extends State<AddCarForm> {
         _insurance = false;
         _images.clear();
       });
+
       ScaffoldMessenger.of(context).showSnackBar(SnackBar(
         content: Text('Машина успешно добавлена в базу данных'),
       ));
@@ -88,6 +122,7 @@ class _AddCarFormState extends State<AddCarForm> {
       ));
     }
   }
+
 
   @override
   Widget build(BuildContext context) {

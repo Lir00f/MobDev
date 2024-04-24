@@ -4,6 +4,8 @@ import 'rent_car_page.dart';
 import 'package:firebase_auth/firebase_auth.dart';
 
 class RegisteredContent extends StatelessWidget {
+  const RegisteredContent({super.key});
+
   @override
   Widget build(BuildContext context) {
     final user = FirebaseAuth.instance.currentUser;
@@ -14,10 +16,10 @@ class RegisteredContent extends StatelessWidget {
       crossAxisAlignment: CrossAxisAlignment.start,
       children: [
         Padding(
-          padding: EdgeInsets.only(left: 16.0, top: 8.0),
+          padding: const EdgeInsets.only(left: 16.0, top: 8.0),
           child: Text(
             'Привет, $username',
-            style: TextStyle(
+            style: const TextStyle(
               fontSize: 18.0,
               fontWeight: FontWeight.bold,
             ),
@@ -28,8 +30,6 @@ class RegisteredContent extends StatelessWidget {
             child: Column(
               mainAxisAlignment: MainAxisAlignment.center,
               children: [
-                const Text('Контент для ЗАРЕГИСТРИРОВАННЫХ в системе'),
-                SizedBox(height: 20),
                 ElevatedButton(
                   onPressed: () {
                     Navigator.push(
@@ -37,9 +37,9 @@ class RegisteredContent extends StatelessWidget {
                       MaterialPageRoute(builder: (context) => AddCarForm()),
                     );
                   },
-                  child: Text('Я хочу сдавать машину в аренду'),
+                  child: const Text('Я хочу сдавать машину в аренду'),
                 ),
-                SizedBox(height: 10),
+                const SizedBox(height: 10),
                 ElevatedButton(
                   onPressed: () {
                     Navigator.push(
@@ -47,7 +47,7 @@ class RegisteredContent extends StatelessWidget {
                       MaterialPageRoute(builder: (context) => RentCarPage()),
                     );
                   },
-                  child: Text('Я хочу снять машину'),
+                  child: const Text('Я хочу снять машину'),
                 ),
               ],
             ),
@@ -59,7 +59,7 @@ class RegisteredContent extends StatelessWidget {
 }
 
 void main() {
-  runApp(MaterialApp(
+  runApp(const MaterialApp(
     home: RegisteredContent(),
   ));
 }
