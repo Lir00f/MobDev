@@ -1,5 +1,6 @@
 import 'dart:convert';
 
+import 'package:firebase_auth/firebase_auth.dart';
 import 'package:flutter/material.dart';
 import 'package:image_picker/image_picker.dart';
 import 'dart:io';
@@ -95,7 +96,8 @@ class _AddCarFormState extends State<AddCarForm> {
   Future<void> _addCarToFirebase() async {
     try {
       FirebaseFirestore firestore = FirebaseFirestore.instance;
-      String userId = 'user123';
+      User? user = FirebaseAuth.instance.currentUser;
+      String? userId = user?.email;
 
       List<String> base64Images = [];
       for (File imageFile in _images) {

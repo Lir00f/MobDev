@@ -1,3 +1,5 @@
+import 'dart:convert';
+
 import 'package:firebase_auth/firebase_auth.dart';
 import 'package:flutter/material.dart';
 import 'package:cloud_firestore/cloud_firestore.dart';
@@ -159,6 +161,69 @@ class _AccountScreenState extends State<AccountScreen> {
                     onPressed: () => signOut(),
                     child: const Text('Выйти из аккаунта'),
                   ),
+                  SizedBox(height: 20),
+                  Text(
+                    'Машины, которые вы выставили на аренду:',
+                    style: TextStyle(fontSize: 18, fontWeight: FontWeight.bold),
+                  ),
+                  FutureBuilder(
+                    future: FirebaseFirestore.instance.collection('cars').where('userId', isEqualTo: user?.email).get(),
+                    builder: (context, AsyncSnapshot<QuerySnapshot> snapshot) {
+                      if (snapshot.connectionState == ConnectionState.waiting) {
+                        return Center(child: CircularProgressIndicator());
+                      } else if (snapshot.hasError) {
+                        return Center(child: Text('Ошибка: ${snapshot.error}'));
+                      } else {
+                        final cars = snapshot.data!.docs;
+                        if (cars.isEmpty) {
+                          return Text('У вас нет машин на аренде');
+                        } else {
+                          return Column(
+                            children: cars.map((car) {
+                              final data = car.data() as Map<String, dynamic>;
+                              final base64Images = data['base64Images'] as List<dynamic>;
+                              final base64Image = base64Images.isNotEmpty ? base64Images[0] as String : ''; // Assuming base64Image is a String
+                              final brand = data['brand'] as String;
+                              final model = data['model'] as String;
+                              final carId = car.id;
+
+                              return Card(
+                                margin: EdgeInsets.symmetric(vertical: 8),
+                                child: Padding(
+                                  padding: EdgeInsets.all(16),
+                                  child: Column(
+                                    crossAxisAlignment: CrossAxisAlignment.start,
+                                    children: [
+                                      ClipRRect(
+                                        borderRadius: BorderRadius.circular(8),
+                                        child: Image.memory(
+                                          base64Decode(base64Image),
+                                          width: 100,
+                                          height: 100,
+                                          fit: BoxFit.cover,
+                                        ),
+                                      ),
+                                      SizedBox(height: 8),
+                                      Text(
+                                        'Марка: $brand',
+                                        style: TextStyle(fontWeight: FontWeight.bold),
+                                      ),
+                                      Text('Модель: $model'),
+                                      SizedBox(height: 8),
+                                      TextButton(
+                                        onPressed: () => _confirmDeleteCar(carId),
+                                        child: Text('Удалить машину'),
+                                      ),
+                                    ],
+                                  ),
+                                ),
+                              );
+                            }).toList(),
+                          );
+                        }
+                      }
+                    },
+                  ),
                 ],
               ),
             ),
@@ -166,5 +231,46 @@ class _AccountScreenState extends State<AccountScreen> {
         }
       },
     );
+  }
+
+  Future<void> _confirmDeleteCar(String carId) async {
+    return showDialog(
+      context: context,
+      builder: (BuildContext context) {
+        return AlertDialog(
+          title: Text('Подтвердите удаление'),
+          content: Text('Вы уверены, что хотите удалить эту машину?'),
+          actions: <Widget>[
+            TextButton(
+              onPressed: () => Navigator.of(context).pop(false),
+              child: Text('Отмена'),
+            ),
+            TextButton(
+              onPressed: () {
+                deleteCar(carId);
+                Navigator.of(context).pop(true);
+              },
+              child: Text('Удалить'),
+            ),
+          ],
+        );
+      },
+    );
+  }
+
+
+  Future<void> deleteCar(String carId) async {
+    try {
+      await FirebaseFirestore.instance.collection('cars').doc(carId).delete();
+      ScaffoldMessenger.of(context).showSnackBar(SnackBar(
+        content: Text('Машина успешно удалена'),
+        duration: Duration(seconds: 2),
+      ));
+    } catch (e) {
+      ScaffoldMessenger.of(context).showSnackBar(SnackBar(
+        content: Text('Ошибка при удалении машины: $e'),
+        duration: Duration(seconds: 2),
+      ));
+    }
   }
 }
