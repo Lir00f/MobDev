@@ -2,6 +2,7 @@ import 'dart:convert';
 import 'dart:typed_data';
 import 'package:flutter/material.dart';
 import 'package:cloud_firestore/cloud_firestore.dart';
+import 'car_details_page.dart';
 
 class RentCarPage extends StatelessWidget {
   const RentCarPage({Key? key}) : super(key: key);
@@ -56,7 +57,10 @@ class CarCard extends StatelessWidget {
             subtitle: Text('Пробег: ${data['mileage']} км'),
             trailing: ElevatedButton(
               onPressed: () {
-                // Implement functionality to rent the car
+                Navigator.push(
+                  context,
+                  MaterialPageRoute(builder: (context) => CarDetailsPage(data: data)),
+                );
               },
               child: const Text('Больше информации'),
             ),
@@ -79,6 +83,7 @@ class CarCard extends StatelessWidget {
     );
   }
 }
+
 
 void main() {
   runApp(MaterialApp(
