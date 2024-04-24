@@ -50,6 +50,31 @@ class _AccountScreenState extends State<AccountScreen> {
     }
   }
 
+  Future<void> _confirmDelete(String rentalId) async {
+    return showDialog(
+      context: context,
+      builder: (BuildContext context) {
+        return AlertDialog(
+          title: Text('Подтвердите удаление'),
+          content: Text('Вы уверены, что хотите удалить эту заявку на аренду?'),
+          actions: <Widget>[
+            TextButton(
+              onPressed: () => Navigator.of(context).pop(false),
+              child: Text('Отмена'),
+            ),
+            TextButton(
+              onPressed: () {
+                deleteRental(rentalId);
+                Navigator.of(context).pop(true);
+              },
+              child: Text('Удалить'),
+            ),
+          ],
+        );
+      },
+    );
+  }
+
   @override
   Widget build(BuildContext context) {
     return FutureBuilder(
@@ -120,8 +145,8 @@ class _AccountScreenState extends State<AccountScreen> {
                                 style: TextStyle(fontSize: 12, fontStyle: FontStyle.italic),
                               ),
                               SizedBox(height: 8),
-                              ElevatedButton(
-                                onPressed: () => deleteRental(rentalId),
+                              TextButton(
+                                onPressed: () => _confirmDelete(rentalId),
                                 child: Text('Удалить заявку'),
                               ),
                             ],
